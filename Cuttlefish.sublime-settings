@@ -1,0 +1,21 @@
+{
+	"current_preset": 0,
+
+	"presets": [
+		{
+			"color_scheme": "Packages/Color Scheme - Default/Solarized (Light).tmTheme",
+			"font_face": "Source Code Pro",
+			"font_size": "14.0"
+		},
+		{
+			"color_scheme": "Packages/Tomorrow Color Schemes/Tomorrow-Night-Eighties.tmTheme",
+			"font_face": "ProFont",
+		}
+	],
+
+	"defaults": {
+		"color_scheme": "Packages/Color Scheme - Default/Monokai Bright.tmTheme",
+		"font_face": "Fira Mono",
+		"font_size": "13.0"
+	}
+}
