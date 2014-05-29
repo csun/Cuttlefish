@@ -59,9 +59,6 @@ class CuttlefishCommand(sublime_plugin.WindowCommand):
  
 
 class CuttlefishCycleCommand(CuttlefishCommand):
-    def __init__(self, window):
-        CuttlefishCommand.__init__(self, window)
-
     def run(self, direction="next"):
         next_preset = self.current_preset
 
@@ -79,4 +76,5 @@ class CuttlefishLoadCommand(CuttlefishCommand):
     def run(self):
         names = list(map((lambda preset: preset["name"]), self.presets))
         self.window.show_quick_panel(names, self.switch_to_preset)
-        # Use show_quick_panel
+
+# class CuttlefishSaveCommand(CuttlefishCommand):
