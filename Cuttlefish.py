@@ -70,11 +70,14 @@ class CuttlefishCycleCommand(CuttlefishCommand):
         self.switch_to_preset(next_preset)
 
 class CuttlefishLoadCommand(CuttlefishCommand):
-    def __init__(self, window):
-        CuttlefishCommand.__init__(self, window)
-
     def run(self):
         names = list(map((lambda preset: preset["name"]), self.presets))
-        self.window.show_quick_panel(names, self.switch_to_preset)
+
+        def callback(choice):
+            if choice != -1: self.switch_to_preset(choice)
+
+        self.window.show_quick_panel(names, callback)
 
 # class CuttlefishSaveCommand(CuttlefishCommand):
+#     def run(self, name):
+        
