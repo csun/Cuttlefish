@@ -26,29 +26,55 @@ class Preset:
         elif preference_name in self.defaults:
             self.sublime_preferences.set(preference_name, self.defaults[preference_name])
 
+class CuttlefishCommand(sublime_plugin.WindowCommand):
+    def __init__(self, window):
+        self.window = window
 
-class CuttlefishCycleCommand(sublime_plugin.WindowCommand):
-    def run(self, direction="next"):
-        preferences = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
-        current_preset_index = preferences.get("current_preset", 0)
-        all_presets = preferences.get("presets", [])
-        defaults = preferences.get("defaults", {})
+        self.preferences = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
+        self.current_preset = self.preferences.get("current_preset", 0)
+        self.defaults = self.preferences.get("defaults", {})
+        self.presets = self.preferences.get("presets", [])
 
-        if len(all_presets) == 0:
+    def run(self):
+        pass
+
+    def switch_to_preset(self, preset_number):
+        num_presets = len(self.presets)
+
+        if num_presets == 0:
             return
-        elif direction == "next":
-            current_preset_index += 1
-        else:
-            current_preset_index -= 1
 
-        if current_preset_index >= len(all_presets):
-            current_preset_index = 0
-        elif current_preset_index < 0:
-            current_preset_index = len(all_presets) - 1
+        if preset_number >= num_presets:
+            preset_number = 0
+        elif preset_number < 0:
+            preset_number = num_presets - 1
 
-
-        preset = Preset(all_presets[current_preset_index], defaults)
+        preset = Preset(self.presets[preset_number], self.defaults)
         preset.load()
 
-        preferences.set("current_preset", current_preset_index)
+        self.current_preset = preset_number
+        self.preferences.set("current_preset", preset_number)
         sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
+
+ 
+
+class CuttlefishCycleCommand(CuttlefishCommand):
+    def __init__(self, window):
+        CuttlefishCommand.__init__(self, window)
+
+    def run(self, direction="next"):
+        next_preset = self.current_preset
+
+        if direction == "next":
+            next_preset += 1
+        else:
+            next_preset -= 1
+
+        self.switch_to_preset(next_preset)
+
+class CuttlefishLoadCommand(sublime_plugin.WindowCommand):
+     def run(self, name):
+        preferences = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
+        all_presets = preferences.get("presets", [])
+        sublime.active_window().show_quick_panel(["hi","ho"], )
+        # Use show_quick_panel
