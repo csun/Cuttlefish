@@ -72,9 +72,11 @@ class CuttlefishCycleCommand(CuttlefishCommand):
 
         self.switch_to_preset(next_preset)
 
-class CuttlefishLoadCommand(sublime_plugin.WindowCommand):
-     def run(self, name):
-        preferences = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
-        all_presets = preferences.get("presets", [])
-        sublime.active_window().show_quick_panel(["hi","ho"], )
+class CuttlefishLoadCommand(CuttlefishCommand):
+    def __init__(self, window):
+        CuttlefishCommand.__init__(self, window)
+
+    def run(self):
+        names = list(map((lambda preset: preset["name"]), self.presets))
+        self.window.show_quick_panel(names, self.switch_to_preset)
         # Use show_quick_panel
