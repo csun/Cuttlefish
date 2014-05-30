@@ -94,11 +94,10 @@ class CuttlefishLoadCommand(CuttlefishCommandBase):
 class CuttlefishSaveCommand(CuttlefishCommandBase):
     def run(self):
         active_view = self.window.active_view()
-        data = {
-            "color_scheme": active_view.settings().get("color_scheme"),
-            "font_face": active_view.settings().get("font_face"),
-            "font_size": active_view.settings().get("font_size")
-        } 
+
+        data = {}
+        for setting in Preset.CONTROLLED_SETTINGS:
+            data[setting] = active_view.settings().get(setting)
 
         preset = Preset(data)
         self.window.show_input_panel("Preset name:","",preset.save_as,None,None)
