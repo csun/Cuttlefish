@@ -31,7 +31,7 @@ class Preset:
             data["name"] = name
             presets.append(data)
 
-            cuttlefish_prefs.set("presets", data)
+            cuttlefish_prefs.set("presets", presets)
             sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
 
 
@@ -97,8 +97,8 @@ class CuttlefishLoadCommand(CuttlefishCommand):
         self.window.show_quick_panel(names, callback)
 
 class CuttlefishSaveCommand(CuttlefishCommand):
-    def run(self, name):
-        super.run()
+    def run(self):
+        super().run()
 
         self.reload_data_from_preferences()
 
@@ -109,4 +109,5 @@ class CuttlefishSaveCommand(CuttlefishCommand):
             "font_size": active_view.settings().get("font_size")
         } 
 
-
+        preset = Preset(data)
+        self.window.show_input_panel("Preset name:","",preset.save_as,None,None)
