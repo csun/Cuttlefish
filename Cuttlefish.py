@@ -55,13 +55,10 @@ class CuttlefishCommand(sublime_plugin.WindowCommand):
     def switch_to_preset(self, preset_number):
         num_presets = len(self.presets)
 
-        if num_presets == 0:
-            return
+        if num_presets == 0: return
 
-        if preset_number >= num_presets:
-            preset_number = 0
-        elif preset_number < 0:
-            preset_number = num_presets - 1
+        if preset_number >= num_presets: preset_number = 0
+        elif preset_number < 0: preset_number = num_presets - 1
 
         preset = Preset(self.presets[preset_number])
         preset.load()
@@ -82,10 +79,8 @@ class CuttlefishCycleCommand(CuttlefishCommand):
 
         next_preset = self.current_preset
 
-        if direction == "next":
-            next_preset += 1
-        else:
-            next_preset -= 1
+        if direction == "next": next_preset += 1
+        else: next_preset -= 1
 
         self.switch_to_preset(next_preset)
 
