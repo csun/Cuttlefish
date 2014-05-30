@@ -44,8 +44,13 @@ class Preset:
             cuttlefish_prefs = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
             presets = cuttlefish_prefs.get("presets", [])
 
-            presets = list(filter((lambda preset: preset["name"] != self.raw_data["name"]), presets))
-            presets.append(self.raw_data)
+            overwritten = False
+            for i in range(0, len(presets)):
+                if presets[i]["name"] == self.raw_data["name"]:
+                    presets[i] = self.raw_data
+                    overwritten = True
+
+            if not overwritten: presets.append(self.raw_data)
 
             cuttlefish_prefs.set("presets", presets)
             sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
