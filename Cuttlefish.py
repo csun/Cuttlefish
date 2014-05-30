@@ -7,21 +7,33 @@ SUBLIME_PREFS_FILENAME = "Preferences.sublime-settings"
 CUTTLEFISH_PREFS_FILENAME = "Cuttlefish.sublime-settings"
 
 class Preset:
+    CONTROLLED_SETTINGS = ["color_scheme", "font_face", "font_size"]
+
     def __init__(self, data):
         self.raw_data = data
 
-    def load(self):
-        self.sublime_preferences = sublime.load_settings(SUBLIME_PREFS_FILENAME)
 
-        self.set_preference("color_scheme")
-        self.set_preference("font_face")
-        self.set_preference("font_size")
+    def load(self):
+        sublime_preferences = sublime.load_settings(SUBLIME_PREFS_FILENAME)
+
+        for setting in Preset.CONTROLLED_SETTINGS:
+            if not (setting in self.raw_data): return
+            sublime_preferences.set(setting, self.raw_data[setting])
 
         sublime.save_settings(SUBLIME_PREFS_FILENAME)
 
-    def set_preference(self, preference_name):
-        if preference_name in self.raw_data:
-            self.sublime_preferences.set(preference_name, self.raw_data[preference_name])
+    def save_as(self, name):
+        if len(name) > 0:
+            cuttlefish_prefs = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
+            presets = cuttlefish_prefs.get("presets")
+
+            data = self.raw_data
+            data["name"] = name
+            presets.append(data)
+
+            cuttlefish_prefs.set("presets", data)
+            sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
+
 
 class CuttlefishCommand(sublime_plugin.WindowCommand):
     def __init__(self, window):
@@ -97,4 +109,4 @@ class CuttlefishSaveCommand(CuttlefishCommand):
             "font_size": active_view.settings().get("font_size")
         } 
 
-        preset = Preset(data)
+
