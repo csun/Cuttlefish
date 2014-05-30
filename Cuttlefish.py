@@ -50,7 +50,7 @@ class CuttlefishCommand(sublime_plugin.WindowCommand):
         self.presets = self.preferences.get("presets", [])
 
     def run(self):
-        self.reload_data_from_preferences()
+        pass
 
     def switch_to_preset(self, preset_number):
         num_presets = len(self.presets)
@@ -71,11 +71,14 @@ class CuttlefishCommand(sublime_plugin.WindowCommand):
 
         sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
 
+    def show_preset_select_panel(self, callback):
+        names = list(map((lambda preset: preset["name"]), self.presets))
+        self.window.show_quick_panel(names, callback)
  
 
 class CuttlefishCycleCommand(CuttlefishCommand):
     def run(self, direction="next"):
-        super().run()
+        self.reload_data_from_preferences()
 
         next_preset = self.current_preset
 
@@ -88,23 +91,16 @@ class CuttlefishCycleCommand(CuttlefishCommand):
 
 class CuttlefishLoadCommand(CuttlefishCommand):
     def run(self):
-        super().run()
-
         self.reload_data_from_preferences()
-
-        names = list(map((lambda preset: preset["name"]), self.presets))
 
         def callback(choice):
             if choice != -1: self.switch_to_preset(choice)
 
-        self.window.show_quick_panel(names, callback)
+        self.show_preset_select_panel(callback)
+
 
 class CuttlefishSaveCommand(CuttlefishCommand):
     def run(self):
-        super().run()
-
-        self.reload_data_from_preferences()
-
         active_view = self.window.active_view()
         data = {
             "color_scheme": active_view.settings().get("color_scheme"),
@@ -114,3 +110,14 @@ class CuttlefishSaveCommand(CuttlefishCommand):
 
         preset = Preset(data)
         self.window.show_input_panel("Preset name:","",preset.save_as,None,None)
+
+class CuttlefishDeleteCommand(CuttlefishCommand):
+    def run(self):
+        self.reload_data_from_preferences()
+
+        def callback(choice):
+            del self.presets[choice]
+            self.preferences.set("presets", self.presets)
+            sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
+
+        self.show_preset_select_panel(callback)
