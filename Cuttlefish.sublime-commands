@@ -1,0 +1,22 @@
+[
+    {
+        "caption": "Cuttlefish: Next Preset",
+        "command": "cuttlefish_cycle", "args": { "direction": "next" }
+    },
+    {
+        "caption": "Cuttlefish: Previous Preset",
+        "command": "cuttlefish_cycle", "args": { "direction": "previous" }
+    },
+    {
+        "caption": "Cuttlefish: Load Preset",
+        "command": "cuttlefish_load"
+    },
+    {
+        "caption": "Cuttlefish: Save Current Settings As Preset",
+        "command": "cuttlefish_save"
+    },
+    {
+        "caption": "Cuttlefish: Delete Preset",
+        "command": "cuttlefish_delete"
+    }
+]

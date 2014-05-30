@@ -1,0 +1,4 @@
+[
+    { "keys": ["f8"], "command": "cuttlefish_cycle", "args": { "direction": "next" } },
+    { "keys": ["shift+f8"], "command": "cuttlefish_cycle", "args": { "direction": "previous" } },
+]
