@@ -7,7 +7,7 @@ SUBLIME_PREFS_FILENAME = "Preferences.sublime-settings"
 CUTTLEFISH_PREFS_FILENAME = "Cuttlefish.sublime-settings"
 
 class Preset:
-    CONTROLLED_SETTINGS = ["color_scheme", "font_face", "font_size"]
+    DEFAULT_CONTROLLED_SETTINGS = ["color_scheme", "font_face", "font_size"]
 
     def __init__(self, data):
         self.raw_data = data
@@ -16,7 +16,7 @@ class Preset:
     def load(self):
         sublime_preferences = sublime.load_settings(SUBLIME_PREFS_FILENAME)
 
-        for setting in Preset.CONTROLLED_SETTINGS:
+        for setting in Preset.get_controlled_settings():
             if not (setting in self.raw_data): return
             sublime_preferences.set(setting, self.raw_data[setting])
 
@@ -36,6 +36,10 @@ class Preset:
 
             cuttlefish_prefs.set("presets", presets)
             sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
+
+    def get_controlled_settings():
+        cuttlefish_prefs = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
+        return cuttlefish_prefs.get("controlled_settings", Preset.DEFAULT_CONTROLLED_SETTINGS)
 
 
 class CuttlefishCommandBase(sublime_plugin.WindowCommand):
@@ -67,7 +71,11 @@ class CuttlefishCommandBase(sublime_plugin.WindowCommand):
 
     def show_preset_select_panel(self, callback):
         names = list(map((lambda preset: preset["name"]), self.presets))
-        self.window.show_quick_panel(names, callback)
+
+        def checked_callback(choice):
+            if choice != -1: callback(choice)
+
+        self.window.show_quick_panel(names, checked_callback)
  
 
 class CuttlefishCycleCommand(CuttlefishCommandBase):
@@ -84,11 +92,7 @@ class CuttlefishCycleCommand(CuttlefishCommandBase):
 class CuttlefishLoadCommand(CuttlefishCommandBase):
     def run(self):
         self.reload_data_from_preferences()
-
-        def callback(choice):
-            if choice != -1: self.switch_to_preset(choice)
-
-        self.show_preset_select_panel(callback)
+        self.show_preset_select_panel(self.switch_to_preset)
 
 
 class CuttlefishSaveCommand(CuttlefishCommandBase):
@@ -96,7 +100,7 @@ class CuttlefishSaveCommand(CuttlefishCommandBase):
         active_view = self.window.active_view()
 
         data = {}
-        for setting in Preset.CONTROLLED_SETTINGS:
+        for setting in Preset.get_controlled_settings():
             data[setting] = active_view.settings().get(setting)
 
         preset = Preset(data)
