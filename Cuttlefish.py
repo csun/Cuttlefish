@@ -12,30 +12,49 @@ class Preset:
     def __init__(self, data):
         self.raw_data = data
 
+    def from_active_view():
+        active_view = sublime.active_window().active_view()
+
+        data = {}
+        for setting in Preset.get_controlled_settings():
+            data[setting] = active_view.settings().get(setting)
+
+        return Preset(data)
 
     def load(self):
         sublime_preferences = sublime.load_settings(SUBLIME_PREFS_FILENAME)
 
+        missing_settings = False
+
         for setting in Preset.get_controlled_settings():
-            if not (setting in self.raw_data): return
-            sublime_preferences.set(setting, self.raw_data[setting])
+            if setting in self.raw_data:
+                sublime_preferences.set(setting, self.raw_data[setting])
+            else:
+                # If a controlled setting is not present in saved preset,
+                # figure out its value and save it
+                missing_settings = True
 
         sublime.save_settings(SUBLIME_PREFS_FILENAME)
 
-    def save_as(self, name):
-        if len(name) > 0:
+        if missing_settings:
+            new_preset = Preset.from_active_view()
+            new_preset.save_as(self.raw_data["name"])
+
+    def save(self):
             cuttlefish_prefs = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
             presets = cuttlefish_prefs.get("presets", [])
 
-            presets = list(filter((lambda preset: preset["name"] != name), presets))
-
-            data = self.raw_data
-            data["name"] = name
-
-            presets.append(data)
+            presets = list(filter((lambda preset: preset["name"] != self.raw_data["name"]), presets))
+            presets.append(self.raw_data)
 
             cuttlefish_prefs.set("presets", presets)
             sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
+
+    def save_as(self, name):
+        if len(name) > 0:
+            self.raw_data["name"] = name
+            self.save()
+
 
     def get_controlled_settings():
         cuttlefish_prefs = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
@@ -97,13 +116,7 @@ class CuttlefishLoadCommand(CuttlefishCommandBase):
 
 class CuttlefishSaveCommand(CuttlefishCommandBase):
     def run(self):
-        active_view = self.window.active_view()
-
-        data = {}
-        for setting in Preset.get_controlled_settings():
-            data[setting] = active_view.settings().get(setting)
-
-        preset = Preset(data)
+        preset = Preset.from_active_view()
         self.window.show_input_panel("Preset name:","",preset.save_as,None,None)
 
 class CuttlefishDeleteCommand(CuttlefishCommandBase):
