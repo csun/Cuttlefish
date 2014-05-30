@@ -38,7 +38,7 @@ class Preset:
             sublime.save_settings(CUTTLEFISH_PREFS_FILENAME)
 
 
-class CuttlefishCommand(sublime_plugin.WindowCommand):
+class CuttlefishCommandBase(sublime_plugin.WindowCommand):
     def __init__(self, window):
         self.window = window
 
@@ -48,9 +48,6 @@ class CuttlefishCommand(sublime_plugin.WindowCommand):
         self.preferences = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
         self.current_preset = self.preferences.get("current_preset", 0)
         self.presets = self.preferences.get("presets", [])
-
-    def run(self):
-        pass
 
     def switch_to_preset(self, preset_number):
         num_presets = len(self.presets)
@@ -73,7 +70,7 @@ class CuttlefishCommand(sublime_plugin.WindowCommand):
         self.window.show_quick_panel(names, callback)
  
 
-class CuttlefishCycleCommand(CuttlefishCommand):
+class CuttlefishCycleCommand(CuttlefishCommandBase):
     def run(self, direction="next"):
         self.reload_data_from_preferences()
 
@@ -84,7 +81,7 @@ class CuttlefishCycleCommand(CuttlefishCommand):
 
         self.switch_to_preset(next_preset)
 
-class CuttlefishLoadCommand(CuttlefishCommand):
+class CuttlefishLoadCommand(CuttlefishCommandBase):
     def run(self):
         self.reload_data_from_preferences()
 
@@ -94,7 +91,7 @@ class CuttlefishLoadCommand(CuttlefishCommand):
         self.show_preset_select_panel(callback)
 
 
-class CuttlefishSaveCommand(CuttlefishCommand):
+class CuttlefishSaveCommand(CuttlefishCommandBase):
     def run(self):
         active_view = self.window.active_view()
         data = {
@@ -106,7 +103,7 @@ class CuttlefishSaveCommand(CuttlefishCommand):
         preset = Preset(data)
         self.window.show_input_panel("Preset name:","",preset.save_as,None,None)
 
-class CuttlefishDeleteCommand(CuttlefishCommand):
+class CuttlefishDeleteCommand(CuttlefishCommandBase):
     def run(self):
         self.reload_data_from_preferences()
 
