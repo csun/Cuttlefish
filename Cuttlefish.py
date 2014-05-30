@@ -27,8 +27,11 @@ class Preset:
             cuttlefish_prefs = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
             presets = cuttlefish_prefs.get("presets")
 
+            presets = list(filter((lambda preset: preset["name"] != name), presets))
+
             data = self.raw_data
             data["name"] = name
+
             presets.append(data)
 
             cuttlefish_prefs.set("presets", presets)
