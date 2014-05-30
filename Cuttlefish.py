@@ -25,7 +25,7 @@ class Preset:
     def save_as(self, name):
         if len(name) > 0:
             cuttlefish_prefs = sublime.load_settings(CUTTLEFISH_PREFS_FILENAME)
-            presets = cuttlefish_prefs.get("presets")
+            presets = cuttlefish_prefs.get("presets", [])
 
             presets = list(filter((lambda preset: preset["name"] != name), presets))
 
